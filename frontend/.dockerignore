@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+.git
+.gitignore
+.vscode/
+.idea/
+*.swp
+*.swo
+*.log
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+README.md

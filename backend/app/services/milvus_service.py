@@ -47,8 +47,7 @@ class MilvusService:
             embedding_function=_PassthroughEmbeddings(),
             collection_name=self._collection_name,
             connection_args={
-                "host": settings.MILVUS_HOST,
-                "port": settings.MILVUS_PORT,
+                "uri": f"http://{settings.MILVUS_HOST}:{settings.MILVUS_PORT}",
             },
             auto_id=False,
             primary_field="chunk_id",

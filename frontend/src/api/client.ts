@@ -16,7 +16,7 @@ import type {
 
 const BASE_URL = ''
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+async function apiRequest<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -35,17 +35,17 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 // ──── Health ────
 
 export async function getHealth(): Promise<HealthResponse> {
-  return request<HealthResponse>('/health')
+  return apiRequest<HealthResponse>('/health')
 }
 
 // ──── PDF Indexing ────
 
 export async function listPDFs(): Promise<PDFListResponse> {
-  return request<PDFListResponse>('/v1/index/pdfs')
+  return apiRequest<PDFListResponse>('/v1/index/pdfs')
 }
 
 export async function deleteAllPDFs(): Promise<DeleteAllResponse> {
-  return request<DeleteAllResponse>('/v1/index/pdfs', { method: 'DELETE' })
+  return apiRequest<DeleteAllResponse>('/v1/index/pdfs', { method: 'DELETE' })
 }
 
 export async function uploadPDF(file: File): Promise<PDFUploadResponse> {
@@ -67,15 +67,15 @@ export async function uploadPDF(file: File): Promise<PDFUploadResponse> {
 
 // ──── Chat ────
 
-export async function chatCompletion(request: ChatRequest): Promise<ChatResponse> {
-  return request<ChatResponse>('/v1/chat/completions', {
+export async function chatCompletion(chatRequest: ChatRequest): Promise<ChatResponse> {
+  return apiRequest<ChatResponse>('/v1/chat/completions', {
     method: 'POST',
-    body: JSON.stringify(request),
+    body: JSON.stringify(chatRequest),
   })
 }
 
 export function chatStream(
-  request: ChatRequest,
+  chatRequest: ChatRequest,
   onChunk: (delta: string) => void,
   onDone: () => void,
   onError: (error: Error) => void,
@@ -86,7 +86,7 @@ export function chatStream(
   fetch(`${BASE_URL}/v1/chat/stream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
+    body: JSON.stringify(chatRequest),
     signal: controller.signal,
   })
     .then(async (response) => {
@@ -157,11 +157,11 @@ export function chatStream(
 // ──── Citations ────
 
 export async function getCitations(chatId: string): Promise<CitationsResponse> {
-  return request<CitationsResponse>(`/v1/chat/citations/${chatId}`)
+  return apiRequest<CitationsResponse>(`/v1/chat/citations/${chatId}`)
 }
 
 // ──── System ────
 
 export async function getSystemStats(): Promise<SystemStats> {
-  return request<SystemStats>('/v1/system/stats')
+  return apiRequest<SystemStats>('/v1/system/stats')
 }

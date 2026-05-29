@@ -1,4 +1,43 @@
 services:
+  # ── Frontend (React + Nginx) ──
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pdf-rag-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+  # ── Backend (FastAPI) ──
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pdf-rag-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # Override service URLs to use Docker service names for internal communication
+      - NEO4J_URI=bolt://neo4j:7687
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+    extra_hosts:
+      # Enable host.docker.internal to access host machine's Ollama
+      # (only used when *_API_KEY=ollama in .env)
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      milvus:
+        condition: service_healthy
+    restart: unless-stopped
+
   # ── Neo4j Graph Database ──
   neo4j:
     image: neo4j:5-community
